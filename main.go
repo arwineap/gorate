@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strconv"
@@ -12,6 +13,19 @@ import (
 
 func main() {
 	client := gorate.NewClient()
+
+	formatter := flag.String("formatter", "full", "specify a formatter (full|cumulative|instantaneous)")
+	flag.Parse()
+	switch f := strings.ToLower(*formatter); f {
+	case "full":
+		client.SetFormatter(gorate.FullFormatter{})
+	case "cumulative":
+		client.SetFormatter(gorate.CumulativeFormatter{})
+	case "instantaneous":
+		client.SetFormatter(gorate.InstantaneousFormatter{})
+	default:
+		fmt.Fprintln(os.Stderr, "WARN: invalid formatter specified, defaulting to full")
+	}
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
